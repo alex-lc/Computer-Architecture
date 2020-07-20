@@ -2,6 +2,11 @@
 
 import sys
 
+# opcodes
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+
 
 class CPU:
     """Main CPU class."""
@@ -9,8 +14,9 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 256
-        self.reg = [0] * 8
+        self.registers = [0] * 8
         self.pc = 0
+        self.running = False
 
     def load(self):
         """Load a program into memory."""
@@ -21,12 +27,12 @@ class CPU:
 
         program = [
             # From print8.ls8
-            0b10000010,  # LDI R0,8
+            LDI,  # LDI R0,8
             0b00000000,
             0b00001000,
-            0b01000111,  # PRN R0
+            PRN,  # PRN R0
             0b00000000,
-            0b00000001,  # HLT
+            HLT   # HLT
         ]
 
         for instruction in program:
@@ -68,6 +74,32 @@ class CPU:
     def ram_write(self, MAR, MDR):
         self.ram[MAR] = MDR
 
+    def HLT(self):
+        self.running = False
+
+    def LDI(self):
+        reg = self.ram_read(self.pc+1)
+        val = self.ram_read(self.pc+2)
+        self.registers[reg] = val
+
+    def PRN(self):
+        reg = self.ram_read(self.pc+1)
+        print(self.registers[reg])
+
     def run(self):
         """Run the CPU."""
-        pass
+        self.running = True
+        while self.running:
+            print('Program starting...')
+            for instruction in self.ram:
+
+                if instruction == LDI:
+                    print('Setting register value...')
+                    self.LDI()
+
+                if instruction == HLT:
+                    print('Running HLT and stopping program...')
+                    self.HLT()
+
+                if instruction == PRN:
+                    self.PRN()
