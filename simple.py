@@ -3,9 +3,7 @@ HALT = 0b10  # 2
 PRINT_NUM = 0b11  # opcode 3
 SAVE = 0b100 # opcode 4
 PRINT_REG = 0b101 # opcode 5
-
-# save the number 99 into R2
-# print whatever is inside R2
+ADD = 0b110 # opcode 6
 
 memory = [
     PRINT_ALEX,
@@ -15,6 +13,12 @@ memory = [
     SAVE,
     2, # register to put it in
     99, # number to save
+    SAVE,
+    3, # register to put it in
+    1, # number to save
+    ADD,
+    2, # register to look at, and save stuff in
+    3, # register to look at
     PRINT_REG,
     2,
     HALT
@@ -57,6 +61,14 @@ while running:
         print(registers[reg_index])
 
         pc += 1
+
+    if command == ADD:
+        num_1 = memory[pc+1]
+        num_2 = memory[pc+2]
+
+        registers[num_1] = registers[num_1] + registers[num_2]
+
+        pc += 2
 
     if command == HALT:
         running = False
