@@ -18,6 +18,12 @@ class CPU:
         self.registers = [0] * 8
         self.pc = 0
         self.running = False
+        self.branch_table = {
+            0b10000010: self.LDI,
+            0b01000111: self.PRN,
+            0b10100010: self.MUL,
+            0b00000001: self.HLT
+        }
 
     def load(self):
         """Load a program into memory."""
@@ -94,17 +100,21 @@ class CPU:
         while self.running:
             print('Program starting...')
             for instruction in self.ram:
+                if instruction in self.branch_table:
+                    self.branch_table[instruction]()
 
-                if instruction == LDI:
-                    print('Setting register value...')
-                    self.LDI()
+            # self.HLT()
 
-                if instruction == MUL:
-                    print('Multiplying numbers...')
-                    self.MUL()
+                # if instruction == LDI:
+                #     print('Setting register value...')
+                #     self.LDI()
 
-                if instruction == HLT:
-                    self.HLT()
+                # if instruction == MUL:
+                #     print('Multiplying numbers...')
+                #     self.MUL()
 
-                if instruction == PRN:
-                    self.PRN()
+                # if instruction == HLT:
+                #     self.HLT()
+
+                # if instruction == PRN:
+                #     self.PRN()
