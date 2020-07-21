@@ -104,7 +104,6 @@ class CPU:
                     self.MUL()
 
                 if instruction == HLT:
-                    print('Running HLT and stopping program...')
                     self.HLT()
 
                 if instruction == PRN:
