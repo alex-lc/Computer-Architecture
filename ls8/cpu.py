@@ -33,21 +33,6 @@ class CPU:
 
                 address += 1
 
-        # # For now, we've just hardcoded a program:
-        # program = [
-        #     # From print8.ls8
-        #     LDI,  # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     PRN,  # PRN R0
-        #     0b00000000,
-        #     HLT   # HLT
-        # ]
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
-
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
