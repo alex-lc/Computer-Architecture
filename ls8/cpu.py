@@ -6,6 +6,7 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
+MUL = 0b10100010
 
 
 class CPU:
@@ -51,7 +52,10 @@ class CPU:
         """ALU operations."""
 
         if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
+            self.registers[reg_a] += self.registers[reg_b]
+        elif op == "MUL":
+            self.registers[self.ram[reg_a]] *= self.registers[self.ram[reg_b]]
+            self.pc += 3
         # elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
@@ -72,7 +76,7 @@ class CPU:
         ), end='')
 
         for i in range(8):
-            print(" %02X" % self.reg[i], end='')
+            print(" %02X" % self.registers[i], end='')
 
         print()
 
@@ -89,10 +93,15 @@ class CPU:
         reg = self.ram_read(self.pc+1)
         val = self.ram_read(self.pc+2)
         self.registers[reg] = val
+        self.pc += 3
 
     def PRN(self):
         reg = self.ram_read(self.pc+1)
         print(self.registers[reg])
+        self.pc += 2
+
+    def MUL(self):
+        self.alu("MUL", self.pc+1, self.pc+2)
 
     def run(self):
         """Run the CPU."""
@@ -104,6 +113,10 @@ class CPU:
                 if instruction == LDI:
                     print('Setting register value...')
                     self.LDI()
+
+                if instruction == MUL:
+                    print('Multiplying numbers...')
+                    self.MUL()
 
                 if instruction == HLT:
                     print('Running HLT and stopping program...')
