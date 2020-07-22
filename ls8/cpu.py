@@ -2,12 +2,6 @@
 
 import sys
 
-# opcodes
-HLT = 0b00000001
-LDI = 0b10000010
-PRN = 0b01000111
-MUL = 0b10100010
-
 
 class CPU:
     """Main CPU class."""
@@ -102,19 +96,3 @@ class CPU:
             for instruction in self.ram:
                 if instruction in self.branch_table:
                     self.branch_table[instruction]()
-
-            # self.HLT()
-
-                # if instruction == LDI:
-                #     print('Setting register value...')
-                #     self.LDI()
-
-                # if instruction == MUL:
-                #     print('Multiplying numbers...')
-                #     self.MUL()
-
-                # if instruction == HLT:
-                #     self.HLT()
-
-                # if instruction == PRN:
-                #     self.PRN()
