@@ -9,13 +9,16 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 256
-        self.registers = [0] * 8
+        self.registers = [0, 0, 0, 0, 0, 0, 0, 0xF4]
         self.pc = 0
         self.running = False
+        self.sp = 7
         self.branch_table = {
             0b10000010: self.LDI,
             0b01000111: self.PRN,
             0b10100010: self.MUL,
+            0b01000101: self.PUSH,
+            0b01000110: self.POP,
             0b00000001: self.HLT
         }
 
@@ -87,6 +90,20 @@ class CPU:
 
     def MUL(self):
         self.alu("MUL", self.pc+1, self.pc+2)
+
+    def PUSH(self):
+        self.registers[self.sp] -= 1
+        reg_number = self.ram[self.pc+1]
+        value = self.registers[reg_number]
+        self.ram[self.registers[self.sp]] = value
+        self.pc += 2
+
+    def POP(self):
+        address = self.registers[self.sp]
+        value = self.ram[address]
+        self.registers[self.ram[self.pc+1]] = value
+        self.registers[self.sp] += 1
+        self.pc += 2
 
     def run(self):
         """Run the CPU."""
