@@ -17,8 +17,11 @@ class CPU:
             0b10000010: self.LDI,
             0b01000111: self.PRN,
             0b10100010: self.MUL,
+            0b10100000: self.ADD,
             0b01000101: self.PUSH,
             0b01000110: self.POP,
+            0b01010000: self.CALL,
+            0b00010001: self.RET,
             0b00000001: self.HLT
         }
 
@@ -41,6 +44,7 @@ class CPU:
 
         if op == "ADD":
             self.registers[reg_a] += self.registers[reg_b]
+            self.pc += 3
         elif op == "MUL":
             self.registers[self.ram[reg_a]] *= self.registers[self.ram[reg_b]]
             self.pc += 3
@@ -88,6 +92,9 @@ class CPU:
         print(self.registers[reg])
         self.pc += 2
 
+    def ADD(self):
+        self.alu("ADD", self.ram[self.pc+1], self.ram[self.pc+2])
+
     def MUL(self):
         self.alu("MUL", self.pc+1, self.pc+2)
 
@@ -105,11 +112,34 @@ class CPU:
         self.registers[self.sp] += 1
         self.pc += 2
 
+    def CALL(self):
+        reg = self.ram[self.pc+1]
+        address = self.registers[reg]
+
+        return_address = self.pc + 2
+
+        self.registers[7] -= 1
+        sp = self.registers[7]
+
+        self.ram[sp] = return_address
+
+        self.pc = address
+
+    def RET(self):
+        sp = self.registers[7]
+        return_address = self.ram[sp]
+        self.registers[7] += 1
+
+        self.pc = return_address
+
     def run(self):
         """Run the CPU."""
         self.running = True
         while self.running:
-            print('Program starting...')
-            for instruction in self.ram:
-                if instruction in self.branch_table:
-                    self.branch_table[instruction]()
+            ir = self.ram_read(self.pc)
+            if ir in self.branch_table:
+                self.branch_table[ir]()
+                
+            # for instruction in self.ram:
+            #     if instruction in self.branch_table:
+            #         self.branch_table[instruction]()
