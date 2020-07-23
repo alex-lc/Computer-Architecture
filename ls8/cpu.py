@@ -29,15 +29,17 @@ class CPU:
         """Load a program into memory."""
 
         address = 0
+        if len(sys.argv) > 1:
+            with open(sys.argv[1], 'r') as f:
+                for current_line in f:
+                    if current_line == "\n" or current_line[0] == "#":
+                        continue
+                    else:
+                        self.ram[address] = int(current_line.split()[0], 2)
 
-        with open(sys.argv[1], 'r') as f:
-            for current_line in f:
-                if current_line == "\n" or current_line[0] == "#":
-                    continue
-                else:
-                    self.ram[address] = int(current_line.split()[0], 2)
-
-                address += 1
+                    address += 1
+        else:
+            raise Exception('Please enter a filename.')
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -139,7 +141,7 @@ class CPU:
             ir = self.ram_read(self.pc)
             if ir in self.branch_table:
                 self.branch_table[ir]()
-                
+
             # for instruction in self.ram:
             #     if instruction in self.branch_table:
             #         self.branch_table[instruction]()
