@@ -13,6 +13,7 @@ class CPU:
         self.pc = 0
         self.running = False
         self.sp = 7
+        self.flags = [0, 0, 0, 0, 0, 0, 0, 0]
         self.branch_table = {
             0b10000010: self.LDI,
             0b01000111: self.PRN,
@@ -22,6 +23,10 @@ class CPU:
             0b01000110: self.POP,
             0b01010000: self.CALL,
             0b00010001: self.RET,
+            0b10100111: self.CMP,
+            0b01010100: self.JMP,
+            0b01010101: self.JEQ,
+            0b01010110: self.JNE,
             0b00000001: self.HLT
         }
 
@@ -49,6 +54,14 @@ class CPU:
             self.pc += 3
         elif op == "MUL":
             self.registers[self.ram[reg_a]] *= self.registers[self.ram[reg_b]]
+            self.pc += 3
+        elif op == "CMP":
+            if self.registers[reg_a] < self.registers[reg_b]:
+                self.flags[5] = 1
+            if self.registers[reg_a] > self.registers[reg_b]:
+                self.flags[6] = 1
+            if self.registers[reg_a] == self.registers[reg_b]:
+                self.flags[7] = 1
             self.pc += 3
         # elif op == "SUB": etc
         else:
@@ -134,6 +147,25 @@ class CPU:
 
         self.pc = return_address
 
+    def CMP(self):
+        self.alu("CMP", self.ram[self.pc+1], self.ram[self.pc+2])
+
+    def JMP(self):
+        jump_to = self.registers[self.ram[self.pc+1]]
+        self.pc = jump_to
+
+    def JEQ(self):
+        if self.flags[-1] == 1:
+            self.pc = self.registers[self.ram[self.pc+1]]
+        else:
+            self.pc += 2
+
+    def JNE(self):
+        if self.flags[-1] == 0:
+            self.pc = self.registers[self.ram[self.pc+1]]
+        else:
+            self.pc += 2
+
     def run(self):
         """Run the CPU."""
         self.running = True
@@ -141,7 +173,3 @@ class CPU:
             ir = self.ram_read(self.pc)
             if ir in self.branch_table:
                 self.branch_table[ir]()
-
-            # for instruction in self.ram:
-            #     if instruction in self.branch_table:
-            #         self.branch_table[instruction]()
